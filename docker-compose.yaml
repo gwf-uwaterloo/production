@@ -1,0 +1,97 @@
+version: '3'
+
+services:
+
+  nginx:
+    image: nginx:latest
+    container_name: production_nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      - backend-cuizinart
+      - backend-caspar
+    depends_on: 
+      - cuizinart
+      - caspar
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  cuizinart_postgres:
+    image: postgres:11
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PW}
+    expose:
+       - '5432'
+    networks:
+       - backend-cuizinart
+
+  caspar_postgres:
+    image: postgres:11
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PW}
+    expose:
+       - '5433'
+    networks:
+       - backend-caspar
+
+  cuizinart:
+     build: ../cuizinart-prod/cuizinart
+     restart: unless-stopped
+     depends_on:
+       - cuizinart_postgres
+     env_file:
+       - ../cuizinart-prod/.env
+     networks:
+       - backend-cuizinart
+     ports:
+       - '5000:5000'
+     volumes:
+       - ${NC_INPUT_PATH}:${NC_INPUT_PATH}
+       - ${LOG_DIRECTORY}:${LOG_DIRECTORY}
+       - ${SSH_KEYFILE_PATH}:${SSH_KEYFILE_PATH}
+       - ${SSH_KNOWN_HOSTS_PATH}:/root/.ssh/known_hosts
+       - ${DB_MIGRATIONS_FOLDER}:/migrations
+
+  caspar:
+     build: ../caspar-prod/cuizinart
+     restart: unless-stopped
+     depends_on:
+       - caspar_postgres
+     env_file:
+       - ../caspar-prod/.env
+     networks: 
+       - backend-caspar
+     ports:
+       - '5010:5010'
+     volumes:
+       - ${NC_INPUT_PATH}:${NC_INPUT_PATH}
+       - ${LOG_DIRECTORY}:${LOG_DIRECTORY}
+       - ${SSH_KEYFILE_PATH}:${SSH_KEYFILE_PATH}
+       - ${SSH_KNOWN_HOSTS_PATH}:/root/.ssh/known_hosts
+       - ${DB_MIGRATIONS_FOLDER}:/migrations     
+
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  backend-cuizinart:
+    driver: bridge
+  backend-caspar:
+    driver: bridge
+
