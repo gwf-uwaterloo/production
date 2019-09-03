@@ -58,10 +58,10 @@ services:
        - '5000:5000'
      volumes:
        - ${NC_INPUT_PATH}:${NC_INPUT_PATH}
-       - ${LOG_DIRECTORY}:${LOG_DIRECTORY}
+       - ${LOG_DIRECTORY}/cuizinart:${LOG_DIRECTORY}
        - ${SSH_KEYFILE_PATH}:${SSH_KEYFILE_PATH}
        - ${SSH_KNOWN_HOSTS_PATH}:/root/.ssh/known_hosts
-       - ${DB_MIGRATIONS_FOLDER}:/migrations
+       - ${DB_MIGRATIONS_FOLDER}/cuizinart:/migrations
 
   caspar:
      build: ../caspar-prod/cuizinart
@@ -76,10 +76,10 @@ services:
        - '5000:5000'
      volumes:
        - ${NC_INPUT_PATH}:${NC_INPUT_PATH}
-       - ${LOG_DIRECTORY}:${LOG_DIRECTORY}
+       - ${LOG_DIRECTORY}/caspar:${LOG_DIRECTORY}
        - ${SSH_KEYFILE_PATH}:${SSH_KEYFILE_PATH}
        - ${SSH_KNOWN_HOSTS_PATH}:/root/.ssh/known_hosts
-       - ${DB_MIGRATIONS_FOLDER}:/migrations     
+       - ${DB_MIGRATIONS_FOLDER}/caspar:/migrations     
 
   certbot:
     image: certbot/certbot
