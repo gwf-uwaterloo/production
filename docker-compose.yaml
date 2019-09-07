@@ -55,8 +55,8 @@ services:
        - ../cuizinart-prod/.env
      networks:
        - backend-cuizinart
-     ports:
-       - '5000:5000'
+     expose:
+       - '5000'
      volumes:
        - ${NC_INPUT_PATH}:${NC_INPUT_PATH}
        - ${LOG_DIRECTORY}/cuizinart:${LOG_DIRECTORY}
@@ -73,8 +73,8 @@ services:
        - ../caspar-prod/.env
      networks: 
        - backend-caspar
-     ports:
-       - '5000:5000'
+     expose:
+       - '5000'
      volumes:
        - ${NC_INPUT_PATH}:${NC_INPUT_PATH}
        - ${LOG_DIRECTORY}/caspar:${LOG_DIRECTORY}
