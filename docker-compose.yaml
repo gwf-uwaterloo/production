@@ -61,16 +61,16 @@ services:
        - ${NC_INPUT_PATH}:${NC_INPUT_PATH}
        - ${LOG_DIRECTORY}/cuizinart:${LOG_DIRECTORY}
        - ${SSH_KEYFILE_PATH}:${SSH_KEYFILE_PATH}
-       - ${SSH_KNOWN_HOSTS_PATH}:/root/.ssh/known_hosts
-       - ${DB_MIGRATIONS_FOLDER}/cuizinart:/migrations
+       - ${SSH_KNOWN_HOSTS_PATH}:/home/gwf/.ssh/known_hosts
+       - ${DB_MIGRATIONS_FOLDER}/cuizinart:/tmp/migrations
 
   caspar:
-     build: ../caspar-prod/cuizinart
+     build: ../caspar-dev/cuizinart
      restart: unless-stopped
      depends_on:
        - caspar_postgres
      env_file:
-       - ../caspar-prod/.env
+       - ../caspar-dev/.env
      networks: 
        - backend-caspar
      expose:
@@ -79,8 +79,8 @@ services:
        - ${NC_INPUT_PATH}:${NC_INPUT_PATH}
        - ${LOG_DIRECTORY}/caspar:${LOG_DIRECTORY}
        - ${SSH_KEYFILE_PATH}:${SSH_KEYFILE_PATH}
-       - ${SSH_KNOWN_HOSTS_PATH}:/root/.ssh/known_hosts
-       - ${DB_MIGRATIONS_FOLDER}/caspar:/migrations     
+       - ${SSH_KNOWN_HOSTS_PATH}:/home/gwf/.ssh/known_hosts
+       - ${DB_MIGRATIONS_FOLDER}/caspar:/tmp/migrations     
 
   certbot:
     image: certbot/certbot
