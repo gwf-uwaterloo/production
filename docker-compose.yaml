@@ -47,8 +47,14 @@ services:
        - backend-caspar
 
   cuizinart:
-     build: ../cuizinart-prod/cuizinart
+     build:
+       context: ../cuizinart-prod/cuizinart
+       args:
+         userid: ${USER_ID}
      restart: unless-stopped
+     read_only: true
+     tmpfs:
+       - /tmp
      depends_on:
        - cuizinart_postgres
      env_file:
